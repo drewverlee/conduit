@@ -1,5 +1,5 @@
 (ns conduit.usecases.article.command.create-article-test
-  (:require [conduit.usecases.article.command.create-article :as sut]
+  (:require [conduit.usecases.article.command.create-article-command :as sut]
             [clojure.test :refer :all]))
 
 (deftest create-article-tests
@@ -7,31 +7,35 @@
                  :description "Ever wonder how?"
                  :body "You have to believe"
                  :tagList ["reactjs" "angularjs" "dragons"]}
-        mock #(conj [] %)]
+        mock #(conj [] %)
+        execute (sut/create-article mock)]
 
-    (testing "Article added to database"
+    (testing "Conforming Article added to database"
       (is (= article
-             ((sut/create-article mock) article))))
+             (execute article))))
 
-    (testing "Bad article not added to database"
+    (testing "Empty article not added to database"
       (is (= nil
-             ((sut/create-article mock) {}))))
+             (execute {}))))
 
-    (testing "Bad article not added to database"
+    (testing "Unconforming article not added to database"
       (is (= nil
-             ((sut/create-article mock) {:title "Title" :body "Body"}))))))
+             (execute {:title "Title" :body "Body"}))))))
 
 
 (deftest optional-taglist-article
   (let [article {:title "How to train your dragon"
                  :description "Ever wonder how?"
                  :body "You have to believe"}
-        mock #(conj [] %)]
+        mock #(conj [] %)
+        execute (sut/create-article mock)]
 
-    (testing "Article added to database"
+    (testing "Article with tag list added to database"
+      (let [taglist ["clojure", "clean"]
+            article_with_taglist (assoc article :tagList taglist)]
+        (is (= article_with_taglist
+               (execute article_with_taglist)))))
+
+    (testing "Article without tag list added to database"
       (is (= article
-             ((sut/create-article mock) article))))
-
-    (testing "Bad article not added to database"
-      (is (= nil
-             ((sut/create-article mock) {}))))))
+             (execute article))))))
