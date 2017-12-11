@@ -3,10 +3,10 @@
             [conduit.domain.article :as article]))
 
 (s/def ::get-article-query
-  (s/keys :req-un [::article/tag
+  (s/keys :opt-un [::article/tag
                    ::article/username
-                   ::article/favorited]
-          :opt-un [::article/limit
+                   ::article/favorited
+                   ::article/limit
                    ::article/offset]))
 
 (defn my-filter
@@ -15,6 +15,14 @@
     (filter #(= v (get-in % ks)) coll)
     coll))
 
+(defn my-coll-filter
+  [ks v articles]
+  (if (some? v)
+    (filter (fn [article]
+              (some #{v} (get-in article ks)))
+            articles)
+    articles))
+
 (defn get-article-list
   [database]
   (fn [query]
@@ -22,11 +30,6 @@
       (let [{:keys [tag username favorited limit offset]
              :or {limit 20 offset 0}} query]
         (->> database
+             (my-filter [:author :username] username)
+             (my-coll-filter [:tagList] tag)
              (my-filter [:favorited] favorited))))))
-
-;; (def query {:tag "" :username "" :favorited true})
-;; (def db [{:favorited true}
-;;          {:favorited false}
-;;          {:favorited false}
-;;          {:favorited true}])
-;; (my-filter [:favorited] false db)

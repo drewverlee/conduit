@@ -32,31 +32,40 @@
 (deftest get-articles-by-favorited-tests
   (let [execute (sut/get-article-list db)]
     (testing "Get Favorited"
-      (let [query {:tag "" :username "" :favorited true}
+      (let [query {:favorited true}
             result (execute query)]
         (is (not-empty result))
         (is (= 1 (count result)))
         (is (= "Alice in Wonderland" (get (first result) :title)))))
 
     (testing "Get Not Favorited"
-      (let [query {:tag "" :username "" :favorited false}
+      (let [query {:favorited false}
             result (execute query)]
         (is (not-empty result))
         (is (= 1 (count result)))
         (is (= "How to train your dragon" (get (first result) :title)))))))
 
-;; (deftest get-articles-by-author-tests
-;;   (let [execute (sut/get-article-list db)]
-;;     (testing "Get Jakes Articles"
-;;       (let [query {:tag "" :username "jake" :favorited nil}
-;;             result (execute query)]
-;;         (is (not-empty result))
-;;         (is (= 1 (count result)))
-;;         (is (= "Alice in Wonderland" (get (first result) :title)))))
+(deftest get-articles-by-author-tests
+  (let [execute (sut/get-article-list db)]
+    (testing "Get Jakes Articles"
+      (let [query {:username "jake"}
+            result (execute query)]
+        (is (not-empty result))
+        (is (= 1 (count result)))
+        (is (= "How to train your dragon" (get (first result) :title)))))
 
-;;     (testing "Get Alice articles"
-;;       (let [query {:tag "" :username "alice" :favorited nil}
-;;             result (execute query)]
-;;         (is (not-empty result))
-;;         (is (= 1 (count result)))
-;;         (is (= "How to train your dragon" (get (first result) :title)))))))
+    (testing "Get Alice articles"
+      (let [query {:username "alice"}
+            result (execute query)]
+        (is (not-empty result))
+        (is (= 1 (count result)))
+        (is (= "Alice in Wonderland" (get (first result) :title)))))))
+
+(deftest get-articles-by-tags-tests
+  (let [execute (sut/get-article-list db)]
+    (testing "Get Mushroom tagged Articles"
+      (let [query {:tag "mushrooms"}
+            result (execute query)]
+        (is (not-empty result))
+        (is (= 1 (count result)))
+        (is (= "Alice in Wonderland" (get (first result) :title)))))))
