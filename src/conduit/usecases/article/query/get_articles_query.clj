@@ -10,20 +10,17 @@
           :opt-un [::article/limit
                    ::article/offset]))
 
+(defn my-filter
+  [ks v coll]
+  (if (some? v)
+    (filter #(= v (get-in % ks)) coll)
+    coll))
+
 (defn get-article-list
   [database]
   (fn [query]
     (when (s/valid? ::get-article-query query)
-      (let [tag (get query ::article/tag)
-            limit (get query ::article/limit 20)
-            offset (get query ::article/offset 0)
-            author (get query ::article/author)
-            favorited (get query ::article/favorited)
-            created-at (get query ::article/createdAt 20)
-            x (if tag (filter #(= % tag) database) database)
-            y (if author (filter #(= % author) x) x)
-            z (if favorited (filter #(= % favorited) y) y)]
-      (->> z
-           (take limit)
-           (drop offset)
-           (sort-by ::article/createdAt))))))
+      (let [{:keys tag username favorited limit offset}
+            :or {limit 20 offset 0}]
+      (->> database
+           (my-filter [:favorited] favorited)
