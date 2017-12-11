@@ -32,4 +32,6 @@
         (->> database
              (my-filter [:author :username] username)
              (my-coll-filter [:tagList] tag)
-             (my-filter [:favorited] favorited))))))
+             (my-filter [:favorited] favorited)
+             (drop offset)
+             (take limit))))))
