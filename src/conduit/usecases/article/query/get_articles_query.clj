@@ -2,7 +2,7 @@
   (:require [clojure.spec.alpha :as s]
             [conduit.domain.article :as article]))
 
-(s/def ::get-article-query
+(s/def ::get-articles-query
   (s/keys :opt-un [::article/tag
                    ::article/username
                    ::article/favorited
@@ -26,7 +26,7 @@
 (defn get-article-list
   [database]
   (fn [query]
-    (when (s/valid? ::get-article-query query)
+    (when (s/valid? ::get-articles-query query)
       (let [{:keys [tag username favorited limit offset]
              :or {limit 20 offset 0}} query]
         (->> database
