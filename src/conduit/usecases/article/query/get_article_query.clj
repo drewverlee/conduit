@@ -18,3 +18,4 @@
       (let [{:keys [slug]} query]
         (->> database
              (my-filter #(= (get % :slug) slug)))))))
+ 
