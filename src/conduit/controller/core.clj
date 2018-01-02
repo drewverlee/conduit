@@ -10,31 +10,32 @@
                   "article/" {"" :article/index
                               [:slug] :article/slug}}])
 
-(defmulti handler :handler)
+(defmulti handler (fn [{:keys [handler]} fn] handler))
 
 (defmethod handler :index
-  [request]
+  [request f]
   "Home")
 
 (defmethod handler :article/index
-  [request]
-  ((get-articles-query/get-articles db/db get-articles-presenter/present) {:tag "dragons"
-                                                                           :username "jake"
-                                                                           :favorited false}))
+  [request f]
+  (f {:tag "dragons"
+      :username "jake"
+      :favorited false}))
 
 (defmethod handler :article/slug
-  [request]
-  ((get-article-query/get-article db/db get-article-presenter/present)
-   {:slug (get-in request [:route-params :slug])}))
+  [request f]
+  (f {:slug (get-in request [:route-params :slug])}))
 
 (defmethod handler :default
-  [request]
+  [request f]
   "Invalid")
 
-(defn handle-request [request]
-  (->> request
-       (bidi/match-route routes)
-       handler))
+(defn handle-request
+  [request f]
+  (handler (bidi/match-route routes request) f))
 
-(handle-request "/article/")
-(handle-request "/article/how-to-train-your-dragon")
+;; examples
+;; => (handle-request "/article/" (get-articles-query/get-articles db/db get-articles-presenter/present))
+;; "<div><ul><li>How to train your dragon</li></ul></div>"
+;; => (handle-request "/article/how-to-train-your-dragon" (get-article-query/get-article db/db get-article-presenter/present))
+;; "<div><h1>How to train your dragon</h1><h1>2016-02-18T03:22:56.637Z</h1><h1>2016-02-18T03:48:35.824Z</h1></div>"
