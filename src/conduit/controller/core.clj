@@ -1,10 +1,12 @@
 (ns conduit.controller.core
-  (:require [bidi.bidi :as bidi]))
-
+  (:require [bidi.bidi :as bidi]
+            [conduit.usecases.article.query.get-article-query :as get-article-query]
+            [conduit.presentation.presenters.get-article-presenter :as get-article-presenter]
+            [conduit.infrastructure.database :as db]))
 
 (def routes ["/" {"index.html" :index
-                  "articles/" {"articles.html" :article/index
-                               [:id "/article.html"] :article/id}}])
+                  "article/" {"" :article/index
+                              [:slug] :article/slug}}])
 
 (defmulti handler :handler)
 
@@ -16,9 +18,10 @@
   [request]
   "Article Index")
 
-(defmethod handler :article/id
+(defmethod handler :article/slug
   [request]
-  (get-in request [:route-params :id]))
+  ((get-article-query/get-article db/db get-article-presenter/present)
+   {:slug (get-in request [:route-params :slug])}))
 
 (defmethod handler :default
   [request]
@@ -29,8 +32,4 @@
        (bidi/match-route routes)
        handler))
 
-(bidi/match-route routes "/index.html")
-
-(handle-request "/index.html")
-(handle-request "/articles/articles.html")
-(handle-request "/articles/123/article.html")
+(handle-request "/article/how-to-train-your-dragon")

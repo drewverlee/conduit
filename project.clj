@@ -8,7 +8,8 @@
                  [org.clojure/test.check "0.10.0-alpha2"]
                  [bidi "2.1.2"]
                  [clj-time "0.14.2"]
-                 [hiccup "2.0.0-alpha1"]]
+                 [hiccup "2.0.0-alpha1"]
+                 [integrant "0.6.3"]]
   :main ^:skip-aot conduit.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
