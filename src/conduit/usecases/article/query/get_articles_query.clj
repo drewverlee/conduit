@@ -23,8 +23,8 @@
             articles)
     articles))
 
-(defn get-article-list
-  [database]
+(defn get-articles
+  [database presenter]
   (fn [query]
     (when (s/valid? ::get-articles-query query)
       (let [{:keys [tag username favorited limit offset]
@@ -34,4 +34,5 @@
              (my-coll-filter [:tagList] tag)
              (my-filter [:favorited] favorited)
              (drop offset)
-             (take limit))))))
+             (take limit)
+             presenter)))))

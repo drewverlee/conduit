@@ -3,6 +3,7 @@
 
 (defn main [article]
   [:div
+   [:h1 (get article :title)]
    [:h1 (get article :createdAt)]
    [:h1 (get article :updatedAt)]])
 
