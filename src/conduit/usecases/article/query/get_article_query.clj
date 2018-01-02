@@ -12,10 +12,10 @@
        first))
 
 (defn get-article
-  [database]
+  [database presenter]
   (fn [query]
     (when (s/valid? ::get-article-query query)
       (let [{:keys [slug]} query]
         (->> database
-             (my-filter #(= (get % :slug) slug)))))))
- 
+             (my-filter #(= (get % :slug) slug))
+             presenter)))))
